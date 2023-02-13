@@ -3,11 +3,13 @@ import Schedule from '../models/Schedule.js'
 /* CREATE */
 export const createSchedule = async (req, res) => {
   try {
-    const { ownerId, date, table } = req.body
+    const { date, table, workers } = req.body
+    const { userId } = req
     const newSchedule = new Schedule({
-      ownerId,
+      ownerId: userId,
       date,
       table,
+      workers,
     })
     const savedSchedule = await newSchedule.save()
 
@@ -66,6 +68,14 @@ export const getSchedule = async (req, res) => {
           options: { retainNullValues: true },
         },
       })
+      .populate({
+        path: 'workers.used',
+        select: 'name shiftTime',
+      })
+      .populate({
+        path: 'workers.unused',
+        select: 'name shiftTime',
+      })
       .exec()
     res.status(200).json(schedule)
   } catch (err) {
@@ -81,10 +91,14 @@ export const moveWorkers = async (req, res) => {
 
     const schedule = await Schedule.findById(scheduleId)
 
-    const { machine, shiftTime, idx } = from
-    const { machine: machineTo, shiftTime: shiftTimeTo, idx: idxTo } = to
-    const fromRow = schedule.table.find((row) => row.machine === machine)
-    const toRow = schedule.table.find((row) => row.machine === machineTo)
+    const { machineId, shiftTime, idx } = from
+    const { machineId: machineIdTo, shiftTime: shiftTimeTo, idx: idxTo } = to
+    const fromRow = schedule.table.find(
+      (row) => row.machine.toString() === machineId
+    )
+    const toRow = schedule.table.find(
+      (row) => row.machine.toString() === machineIdTo
+    )
     if (!toRow || !fromRow) return
     ;[fromRow.data[shiftTime][idx], toRow.data[shiftTimeTo][idxTo]] = [
       toRow.data[shiftTimeTo][idxTo],
@@ -99,15 +113,45 @@ export const moveWorkers = async (req, res) => {
   }
 }
 
+export const placeWorker = async (req, res) => {
+  try {
+    const { scheduleId } = req.params
+    const { destinationDetails, worker } = req.body
+
+    const schedule = await Schedule.findById(scheduleId)
+
+    const { machineId, shiftTime, idx } = destinationDetails
+    const destinationRow = schedule.table.find(
+      (row) => row.machine.toString() === machineId
+    )
+    if (!destinationRow) return
+    destinationRow.data[shiftTime][idx] = worker._id
+
+    const unusedIdx = schedule.workers.unused.findIndex(
+      (w) => w._id.toString() === worker._id
+    )
+    schedule.workers.unused.splice(unusedIdx, 1)
+    schedule.workers.used.push(worker)
+
+    schedule = await schedule.save()
+
+    res.status(200).json(schedule)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
 export const toggleLock = async (req, res) => {
   try {
     const { scheduleId } = req.params
     const { workerDetails } = req.body
 
-    const schedule = await Schedule.findById(scheduleId)
+    let schedule = await Schedule.findById(scheduleId)
 
-    const { machine, shiftTime, idx } = workerDetails
-    const row = schedule.table.find((row) => row.machine === machine)
+    const { machineId, shiftTime, idx } = workerDetails
+    const row = schedule.table.find(
+      (row) => row.machine.toString() === machineId
+    )
     if (!row) return
     row.locked[shiftTime][idx] = !row.locked[shiftTime][idx]
 
@@ -122,13 +166,14 @@ export const toggleLock = async (req, res) => {
 export const saveSchedule = async (req, res) => {
   try {
     const { scheduleId } = req.params
-    const { ownerId, date, table } = req.body
+    const { ownerId, date, table, workers } = req.body
     const updatedSchedule = await Schedule.findByIdAndUpdate(
       scheduleId,
       {
         ownerId,
         date,
         table,
+        workers,
       },
       { new: true }
     )

@@ -3,11 +3,12 @@ import Machine from '../models/Machine.js'
 /* CREATE */
 export const createMachine = async (req, res) => {
   try {
-    const { ownerId, name, amountOfWorkers } = req.body
+    const { userId } = req
+    const { name } = req.body
     const newMachine = new Machine({
-      ownerId,
+      ownerId: userId,
       name,
-      amountOfWorkers,
+      amountOfWorkers: 1,
     })
     const savedMachine = await newMachine.save()
 

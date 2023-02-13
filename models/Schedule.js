@@ -41,6 +41,20 @@ const ScheduleSchema = mongoose.Schema(
         },
       },
     ],
+    workers: {
+      used: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Worker',
+        },
+      ],
+      unused: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Worker',
+        },
+      ],
+    },
   },
   { timestamps: true }
 )

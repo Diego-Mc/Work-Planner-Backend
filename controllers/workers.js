@@ -60,6 +60,39 @@ export const saveWorker = async (req, res) => {
   }
 }
 
+export const setShiftTime = async (req, res) => {
+  try {
+    const { workerId } = req.params
+    const { shiftTime } = req.body
+
+    let worker = await Worker.findById(workerId)
+    worker.shiftTime = shiftTime
+    worker = await worker.save()
+
+    res.status(200).json(worker)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
+export const resetShiftTimes = async (req, res) => {
+  try {
+    const { userId } = req
+
+    const workers = await Worker.find({ ownerId: userId })
+    const prms = workers.map((worker) => {
+      worker.shiftTime = ''
+      return worker.save()
+    })
+
+    const updatedWorkers = await Promise.all(prms)
+
+    res.status(200).json(updatedWorkers)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
 export const deleteWorker = async (req, res) => {
   try {
     const { workerId } = req.params

@@ -5,6 +5,8 @@ import {
   getWorker,
   saveWorker,
   deleteWorker,
+  resetShiftTimes,
+  setShiftTime,
 } from '../controllers/workers.js'
 import { verifyToken } from '../middleware/auth.js'
 
@@ -19,6 +21,8 @@ router.get('/:workerId', getWorker)
 
 /* UPDATE */
 router.post('/save', saveWorker)
+router.patch('/reset-shift-times', verifyToken, resetShiftTimes)
+router.patch('/:workerId/set-shift-time', verifyToken, setShiftTime)
 
 /* DELETE */
 router.delete('/:workerId', verifyToken, deleteWorker)
