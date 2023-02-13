@@ -3,11 +3,12 @@ import Worker from '../models/Worker.js'
 /* CREATE */
 export const createWorker = async (req, res) => {
   try {
-    const { ownerId, name, shiftTime } = req.body
+    const { name } = req.body
+    const { userId } = req
     const newWorker = new Worker({
-      ownerId,
+      ownerId: userId,
       name,
-      shiftTime,
+      shiftTime: '',
     })
     const savedWorker = await newWorker.save()
 

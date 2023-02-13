@@ -15,9 +15,24 @@ const ScheduleSchema = mongoose.Schema(
       {
         machine: { type: mongoose.Schema.Types.ObjectId, ref: 'Machine' },
         data: {
-          morning: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Worker' }],
-          evening: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Worker' }],
-          night: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Worker' }],
+          morning: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'Worker',
+            },
+          ],
+          evening: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'Worker',
+            },
+          ],
+          night: [
+            {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: 'Worker',
+            },
+          ],
         },
         locked: {
           morning: [Boolean],

@@ -11,10 +11,10 @@ import { verifyToken } from '../middleware/auth.js'
 const router = express.Router()
 
 /* CREATE */
-router.post('/', createMachine)
+router.post('/', verifyToken, createMachine)
 
 /* READ */
-router.get('/', getMachines)
+router.get('/', verifyToken, getMachines)
 router.get('/:machineId', getMachine)
 
 /* UPDATE */

@@ -5,20 +5,24 @@ import {
   getSchedule,
   saveSchedule,
   deleteSchedule,
+  moveWorkers,
+  toggleLock,
 } from '../controllers/schedules.js'
 import { verifyToken } from '../middleware/auth.js'
 
 const router = express.Router()
 
 /* CREATE */
-router.post('/', createSchedule)
+router.post('/', verifyToken, createSchedule)
 
 /* READ */
-router.get('/', getSchedules)
+router.get('/', verifyToken, getSchedules)
 router.get('/:scheduleId', getSchedule)
 
 /* UPDATE */
 router.post('/save', saveSchedule)
+router.patch('/:scheduleId/move-workers', moveWorkers)
+router.patch('/:scheduleId/toggle-lock', toggleLock)
 
 /* DELETE */
 router.delete('/:scheduleId', verifyToken, deleteSchedule)

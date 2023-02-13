@@ -57,5 +57,7 @@ function _handleSuccess(user, res) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
   })
-  res.status(200).json({ token, user: { _id: user._id } })
+  res
+    .status(200)
+    .json({ token, user: { _id: user._id, username: user.username } })
 }
