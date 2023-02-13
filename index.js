@@ -7,9 +7,9 @@ import morgan from 'morgan'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
-import userRoutes from './routes/users.js'
-import postRoutes from './routes/posts.js'
-import tagsRoutes from './routes/tags.js'
+import machineRoutes from './routes/machines.js'
+import workerRoutes from './routes/workers.js'
+import scheduleRoutes from './routes/schedules.js'
 import cookieParser from 'cookie-parser'
 
 /* CONFIG */
@@ -31,9 +31,9 @@ if (process.env.NODE_ENV === 'production') {
 
 /* ROUTES */
 app.use('/api/auth', authRoutes)
-app.use('/api/users', userRoutes)
-app.use('/api/posts', postRoutes)
-app.use('/api/tags', tagsRoutes)
+app.use('/api/machines', machineRoutes)
+app.use('/api/workers', workerRoutes)
+app.use('/api/schedules', scheduleRoutes)
 
 app.get('/**', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
