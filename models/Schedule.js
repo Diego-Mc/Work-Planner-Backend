@@ -7,9 +7,8 @@ const ScheduleSchema = mongoose.Schema(
       required: true,
     },
     date: {
-      type: Number,
-      required: true,
-      unique: true,
+      from: { type: Number, required: true },
+      to: { type: Number, required: true },
     },
     table: [
       {

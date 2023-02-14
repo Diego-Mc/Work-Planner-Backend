@@ -10,6 +10,7 @@ import authRoutes from './routes/auth.js'
 import machineRoutes from './routes/machines.js'
 import workerRoutes from './routes/workers.js'
 import scheduleRoutes from './routes/schedules.js'
+import statisticsRoutes from './routes/statistics.js'
 import cookieParser from 'cookie-parser'
 
 /* CONFIG */
@@ -34,6 +35,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/machines', machineRoutes)
 app.use('/api/workers', workerRoutes)
 app.use('/api/schedules', scheduleRoutes)
+app.use('/api/statistics', statisticsRoutes)
 
 app.get('/**', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'))

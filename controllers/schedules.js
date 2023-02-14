@@ -163,6 +163,24 @@ export const toggleLock = async (req, res) => {
   }
 }
 
+export const setDate = async (req, res) => {
+  try {
+    const { scheduleId } = req.params
+    const { date } = req.body
+
+    let schedule = await Schedule.findById(scheduleId)
+
+    schedule.date.to = date.to
+    schedule.date.from = date.from
+
+    schedule = await schedule.save()
+
+    res.status(200).json(schedule)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
 export const saveSchedule = async (req, res) => {
   try {
     const { scheduleId } = req.params
