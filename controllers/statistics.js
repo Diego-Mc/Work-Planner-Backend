@@ -15,41 +15,45 @@ export const getStatistics = async (req, res) => {
       .exec()
     const lastInMachine = {}
     const timeShifts = {}
+    const mTimeShifts = {} //{w1: {morning: {m1: [..] }}}
+    const amountWorked = {} //{w1: {m1: [...]}}
 
     schedules.forEach(({ table, date }) => {
       table.forEach((row) => {
         if (!lastInMachine[row.machine]) lastInMachine[row.machine] = {}
-        row.data.morning.forEach((w) => {
-          if (!w) return
-          if (!lastInMachine[row.machine][w]) lastInMachine[row.machine][w] = []
-          lastInMachine[row.machine][w].push(date.from)
+        ;['morning', 'evening', 'night'].forEach((time) => {
+          row.data[time].forEach((w) => {
+            if (!w) return
+            if (!lastInMachine[row.machine][w])
+              lastInMachine[row.machine][w] = []
+            lastInMachine[row.machine][w].push(date.from)
 
-          if (!timeShifts[w]) timeShifts[w] = {}
-          if (!timeShifts[w].morning) timeShifts[w].morning = []
-          timeShifts[w].morning.push(date.from)
-        })
-        row.data.evening.forEach((w) => {
-          if (!w) return
-          if (!lastInMachine[row.machine][w]) lastInMachine[row.machine][w] = []
-          lastInMachine[row.machine][w].push(date.from)
+            if (!timeShifts[w]) timeShifts[w] = {}
+            if (!timeShifts[w][time]) timeShifts[w][time] = []
+            timeShifts[w][time].push(date.from)
 
-          if (!timeShifts[w]) timeShifts[w] = {}
-          if (!timeShifts[w].evening) timeShifts[w].evening = []
-          timeShifts[w].evening.push(date.from)
-        })
-        row.data.night.forEach((w) => {
-          if (!w) return
-          if (!lastInMachine[row.machine][w]) lastInMachine[row.machine][w] = []
-          lastInMachine[row.machine][w].push(date.from)
+            if (!mTimeShifts[w]) mTimeShifts[w] = {}
+            if (!mTimeShifts[w][time]) mTimeShifts[w][time] = {}
+            if (!mTimeShifts[w][time][row.machine])
+              mTimeShifts[w][time][row.machine] = []
+            mTimeShifts[w][time][row.machine].push(date.from)
 
-          if (!timeShifts[w]) timeShifts[w] = {}
-          if (!timeShifts[w].night) timeShifts[w].night = []
-          timeShifts[w].night.push(date.from)
+            if (!amountWorked[w]) amountWorked[w] = {}
+            if (!amountWorked[w][row.machine]) amountWorked[w][row.machine] = []
+            amountWorked[w][row.machine].push(date.from)
+          })
         })
       })
     })
 
-    res.status(201).json({ lastInMachine, timeShifts })
+    const statistics = {
+      machineTimeShiftsPerWorker: mTimeShifts, //{w1: {morning: {m1: [..] }}}
+      timeShiftsPerWorker: timeShifts,
+      amountWorkedInMachinePerWorker: amountWorked, //{w1: {m1: [...]}}
+      amountWorkedPerMachine: lastInMachine,
+    }
+
+    res.status(201).json(statistics)
   } catch (err) {
     res.status(409).json({ error: err.message })
   }
