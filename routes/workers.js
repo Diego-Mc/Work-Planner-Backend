@@ -20,7 +20,7 @@ router.get('/', verifyToken, getWorkers)
 router.get('/:workerId', getWorker)
 
 /* UPDATE */
-router.post('/save', saveWorker)
+router.post('/:workerId/save', saveWorker)
 router.patch('/reset-shift-times', verifyToken, resetShiftTimes)
 router.patch('/:workerId/set-shift-time', verifyToken, setShiftTime)
 

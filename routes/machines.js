@@ -18,7 +18,7 @@ router.get('/', verifyToken, getMachines)
 router.get('/:machineId', getMachine)
 
 /* UPDATE */
-router.post('/save', saveMachine)
+router.post('/:machineId/save', saveMachine)
 
 /* DELETE */
 router.delete('/:machineId', verifyToken, deleteMachine)

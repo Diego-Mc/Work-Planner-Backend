@@ -44,6 +44,9 @@ export const saveMachine = async (req, res) => {
   try {
     const { machineId } = req.params
     const { ownerId, name, amountOfWorkers } = req.body
+
+    console.log(ownerId, name, amountOfWorkers, machineId)
+
     const updatedMachine = await Machine.findByIdAndUpdate(
       machineId,
       {

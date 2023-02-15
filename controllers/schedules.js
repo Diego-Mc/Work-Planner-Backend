@@ -89,7 +89,7 @@ export const moveWorkers = async (req, res) => {
     const { scheduleId } = req.params
     const { from, to } = req.body
 
-    const schedule = await Schedule.findById(scheduleId)
+    let schedule = await Schedule.findById(scheduleId)
 
     const { machineId, shiftTime, idx } = from
     const { machineId: machineIdTo, shiftTime: shiftTimeTo, idx: idxTo } = to
@@ -118,7 +118,7 @@ export const placeWorker = async (req, res) => {
     const { scheduleId } = req.params
     const { destinationDetails, worker } = req.body
 
-    const schedule = await Schedule.findById(scheduleId)
+    let schedule = await Schedule.findById(scheduleId)
 
     const { machineId, shiftTime, idx } = destinationDetails
     const destinationRow = schedule.table.find(
@@ -209,7 +209,8 @@ export const deleteSchedule = async (req, res) => {
 
     let removedSchedule = await Schedule.findById(scheduleId)
 
-    if (removedSchedule.ownerId !== userId) throw new Error('Not authorized')
+    if (removedSchedule.ownerId.toString() !== userId)
+      throw new Error('Not authorized')
 
     removedSchedule = await Schedule.deleteOne({ _id: scheduleId })
     res.status(200).json(removedSchedule)

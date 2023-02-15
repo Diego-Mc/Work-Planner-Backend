@@ -100,7 +100,8 @@ export const deleteWorker = async (req, res) => {
 
     let removedWorker = await Worker.findById(workerId)
 
-    if (removedWorker.ownerId !== userId) throw new Error('Not authorized')
+    if (removedWorker.ownerId.toString() !== userId)
+      throw new Error('Not authorized')
 
     removedWorker = await Worker.deleteOne({ _id: workerId })
     res.status(200).json(removedWorker)
