@@ -141,6 +141,35 @@ export const placeWorker = async (req, res) => {
   }
 }
 
+export const unplaceWorker = async (req, res) => {
+  try {
+    const { scheduleId } = req.params
+    const { destinationDetails, worker } = req.body
+
+    let schedule = await Schedule.findById(scheduleId)
+
+    const { machineId, shiftTime, idx } = destinationDetails
+    const destinationRow = schedule.table.find(
+      (row) => row.machine.toString() === machineId
+    )
+    if (!destinationRow) return
+    destinationRow.data[shiftTime][idx] = null
+    destinationRow.locked[shiftTime][idx] = false
+
+    const usedIdx = schedule.workers.used.findIndex(
+      (w) => w._id.toString() === worker._id
+    )
+    schedule.workers.used.splice(usedIdx, 1)
+    schedule.workers.unused.push(worker)
+
+    schedule = await schedule.save()
+
+    res.status(200).json(schedule)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
 export const toggleLock = async (req, res) => {
   try {
     const { scheduleId } = req.params
