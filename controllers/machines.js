@@ -9,6 +9,7 @@ export const createMachine = async (req, res) => {
       ownerId: userId,
       name,
       amountOfWorkers: 1,
+      importance: 0,
     })
     const savedMachine = await newMachine.save()
 
@@ -43,9 +44,7 @@ export const getMachine = async (req, res) => {
 export const saveMachine = async (req, res) => {
   try {
     const { machineId } = req.params
-    const { ownerId, name, amountOfWorkers } = req.body
-
-    console.log(ownerId, name, amountOfWorkers, machineId)
+    const { ownerId, name, amountOfWorkers, importance } = req.body
 
     const updatedMachine = await Machine.findByIdAndUpdate(
       machineId,
@@ -53,6 +52,7 @@ export const saveMachine = async (req, res) => {
         ownerId,
         name,
         amountOfWorkers,
+        importance,
       },
       { new: true }
     )

@@ -40,7 +40,7 @@ export const getSchedule = async (req, res) => {
         path: 'table',
         populate: {
           path: 'machine',
-          select: 'name amountOfWorkers',
+          select: 'name amountOfWorkers importance',
           options: { retainNullValues: true },
         },
       })
@@ -154,6 +154,67 @@ export const toggleLock = async (req, res) => {
     )
     if (!row) return
     row.locked[shiftTime][idx] = !row.locked[shiftTime][idx]
+
+    schedule = await schedule.save()
+
+    res.status(200).json(schedule)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
+export const changeMachineWorkersAmount = async (req, res) => {
+  try {
+    const { scheduleId } = req.params
+    const { changeDetails } = req.body
+
+    let schedule = await Schedule.findById(scheduleId)
+
+    const { machineId, newAmount } = changeDetails
+    const row = schedule.table.find(
+      (row) => row.machine._id.toString() === machineId
+    )
+    if (!row) return
+
+    const len = () => row.data.morning.length
+
+    if (newAmount === len()) return
+
+    row.machine.amountOfWorkers = newAmount
+
+    if (newAmount > len()) {
+      while (len() < newAmount) {
+        row.data.morning.push(null)
+        row.locked.morning.push(false)
+        row.data.evening.push(null)
+        row.locked.evening.push(false)
+        row.data.night.push(null)
+        row.locked.night.push(false)
+      }
+    }
+
+    if (newAmount < len()) {
+      let maxActualWorkers = Math.max(
+        row.data.morning.filter((w) => w !== null).length,
+        row.data.evening.filter((w) => w !== null).length,
+        row.data.night.filter((w) => w !== null).length
+      )
+
+      if (maxActualWorkers > newAmount)
+        throw new Error('more workers assigned than requested')
+
+      for (let i = 0; newAmount < len(); i++) {
+        let shouldDecrement = false
+        ;['morning', 'evening', 'night'].forEach((time) => {
+          if (row.data[time][i] === null) {
+            row.data[time].splice(i, 1)
+            row.locked[time].splice(i, 1)
+            shouldDecrement = true
+          }
+        })
+        if (shouldDecrement) i--
+      }
+    }
 
     schedule = await schedule.save()
 

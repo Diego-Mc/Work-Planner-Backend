@@ -9,6 +9,7 @@ import {
   toggleLock,
   placeWorker,
   setDate,
+  changeMachineWorkersAmount,
 } from '../controllers/schedules.js'
 import { verifyToken } from '../middleware/auth.js'
 
@@ -26,6 +27,7 @@ router.post('/save', saveSchedule)
 router.patch('/:scheduleId/move-workers', moveWorkers)
 router.patch('/:scheduleId/place-worker', placeWorker)
 router.patch('/:scheduleId/toggle-lock', toggleLock)
+router.patch('/:scheduleId/workers-amount', changeMachineWorkersAmount)
 router.patch('/:scheduleId/set-date', setDate)
 
 /* DELETE */
