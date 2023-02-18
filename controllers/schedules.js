@@ -125,6 +125,16 @@ export const placeWorker = async (req, res) => {
       (row) => row.machine.toString() === machineId
     )
     if (!destinationRow) return
+
+    if (destinationRow.data[shiftTime][idx] !== null) {
+      const currWorker = destinationRow.data[shiftTime][idx]
+      const usedIdx = schedule.workers.used.findIndex(
+        (w) => w._id === currWorker._id
+      )
+      schedule.workers.used.splice(usedIdx, 1)
+      schedule.workers.unused.push(currWorker)
+    }
+
     destinationRow.data[shiftTime][idx] = worker._id
 
     const unusedIdx = schedule.workers.unused.findIndex(
