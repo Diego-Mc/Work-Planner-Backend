@@ -50,6 +50,22 @@ export const logout = async (req, res) => {
   }
 }
 
+export const fetchUser = async (req, res) => {
+  try {
+    const { loggedInUserId } = req.params
+    const { userId } = req
+    if (!userId) return res.status(404).json({ msg: 'no logged in user' })
+    if (loggedInUserId && loggedInUserId !== userId) {
+      res.clearCookie('jwt')
+      return res.status(403).json({ msg: 'incorrect user' })
+    }
+    const user = await User.findOne({ _id: userId })
+    res.status(200).json({ _id: user._id, username: user.username })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
 function _handleSuccess(user, res) {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET)
   user.password = undefined
