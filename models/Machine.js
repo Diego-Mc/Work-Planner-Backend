@@ -9,7 +9,6 @@ const machineSchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     amountOfWorkers: {
       type: Number,

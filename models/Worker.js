@@ -9,7 +9,6 @@ const workerSchema = mongoose.Schema(
     name: {
       type: String,
       required: true,
-      unique: true,
     },
     shiftTime: {
       type: String,
