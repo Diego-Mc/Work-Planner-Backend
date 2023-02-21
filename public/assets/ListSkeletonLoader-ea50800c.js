@@ -1,0 +1,1 @@
+import{b as e,j as s}from"./index-454c0a50.js";const a=({})=>e("div",{className:"list-skeleton",children:[s("div",{className:"skeleton-box"}),s("div",{className:"skeleton-box"}),s("div",{className:"skeleton-box"}),s("div",{className:"skeleton-box"}),s("div",{className:"skeleton-box"})]});export{a as L};
