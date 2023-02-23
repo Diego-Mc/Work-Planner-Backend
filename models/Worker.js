@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-const workerSchema = mongoose.Schema(
+export const workerSchema = mongoose.Schema(
   {
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,

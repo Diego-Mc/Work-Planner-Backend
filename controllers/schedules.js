@@ -1,4 +1,5 @@
 import Schedule from '../models/Schedule.js'
+import Worker from '../models/Worker.js'
 
 /* CREATE */
 export const createSchedule = async (req, res) => {
@@ -48,7 +49,6 @@ export const getSchedule = async (req, res) => {
         path: 'table',
         populate: {
           path: 'data.morning',
-          select: 'name',
           options: { retainNullValues: true },
         },
       })
@@ -56,7 +56,6 @@ export const getSchedule = async (req, res) => {
         path: 'table',
         populate: {
           path: 'data.evening',
-          select: 'name',
           options: { retainNullValues: true },
         },
       })
@@ -64,17 +63,8 @@ export const getSchedule = async (req, res) => {
         path: 'table',
         populate: {
           path: 'data.night',
-          select: 'name',
           options: { retainNullValues: true },
         },
-      })
-      .populate({
-        path: 'workers.used',
-        select: 'name shiftTime',
-      })
-      .populate({
-        path: 'workers.unused',
-        select: 'name shiftTime',
       })
       .exec()
     res.status(200).json(schedule)
@@ -127,10 +117,12 @@ export const placeWorker = async (req, res) => {
     if (!destinationRow) return
 
     if (destinationRow.data[shiftTime][idx] !== null) {
-      const currWorker = destinationRow.data[shiftTime][idx]
+      let currWorker = destinationRow.data[shiftTime][idx]
       const usedIdx = schedule.workers.used.findIndex(
-        (w) => w._id === currWorker._id
+        (w) => w._id.toString() === currWorker._id.toString()
       )
+      currWorker = await Worker.findById(currWorker._id)
+
       schedule.workers.used.splice(usedIdx, 1)
       schedule.workers.unused.push(currWorker)
     }
@@ -272,6 +264,26 @@ export const setDate = async (req, res) => {
 
     schedule.date.to = date.to
     schedule.date.from = date.from
+
+    schedule = await schedule.save()
+
+    res.status(200).json(schedule)
+  } catch (err) {
+    res.status(404).json({ error: err.message })
+  }
+}
+
+export const placeShiftWorker = async (req, res) => {
+  try {
+    const { scheduleId } = req.params
+    const { worker, newTime } = req.body
+
+    let schedule = await Schedule.findById(scheduleId)
+
+    const foundWorker = schedule.workers.unused.find(
+      (w) => w._id.toString() === worker._id
+    )
+    foundWorker.shiftTime = newTime
 
     schedule = await schedule.save()
 

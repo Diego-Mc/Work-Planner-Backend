@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { workerSchema } from './Worker.js'
 
 const ScheduleSchema = mongoose.Schema(
   {
@@ -41,18 +42,14 @@ const ScheduleSchema = mongoose.Schema(
       },
     ],
     workers: {
-      used: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Worker',
-        },
-      ],
-      unused: [
-        {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Worker',
-        },
-      ],
+      used: {
+        type: [workerSchema],
+        default: [],
+      },
+      unused: {
+        type: [workerSchema],
+        default: [],
+      },
     },
   },
   { timestamps: true }
